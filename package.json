@@ -7,12 +7,14 @@
     "start": "node ."
   },
   "bin": "./index.js",
+  "author": "ChuongIT",
   "dependencies": {
     "chalk": "^4.1.2",
-    "chalk-animation": "^1.6.0",
-    "figlet": "^1.5.2",
-    "gradient-string": "^2.0.0",
     "inquirer": "^8.2.0",
     "nanospinner": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vanchuongkieu/csfa"
   }
 }

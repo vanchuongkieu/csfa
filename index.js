@@ -2,16 +2,9 @@
 
 const fs = require("fs");
 const inquirer = require("inquirer");
-const gradient = require("gradient-string");
-const chalkAnimation = require("chalk-animation");
-const figlet = require("figlet");
 const { createSpinner } = require("nanospinner");
 
 const sleep = (ms = 1000) => new Promise((r) => setTimeout(r, ms));
-
-async function successHandler(isCorrect) {
-  await sleep();
-}
 
 function createfolder(folderpath) {
   if (!fs.existsSync(folderpath)) {
