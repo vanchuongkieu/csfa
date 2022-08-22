@@ -1,6 +1,7 @@
 {
   "name": "csfa",
-  "version": "1.0.0",
+  "version": "1.0.3",
+  "description": "lần đầu làm chuyện ấy",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

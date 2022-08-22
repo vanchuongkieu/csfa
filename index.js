@@ -10,7 +10,6 @@ function createfolder(folderpath) {
   if (!fs.existsSync(folderpath)) {
     fs.mkdirSync(folderpath, { recursive: true });
   }
-  successHandler();
 }
 
 function createfile(filepath, content = "") {
@@ -28,11 +27,16 @@ async function switchchoose(version, chooselist) {
     name: "filename",
     type: "input",
     message: "Enter file name:",
+    validate: function (input) {
+      if (input === "") {
+        return "Please enter file name";
+      }
+      return true;
+    },
   });
-  const spinner = createSpinner("Creating...\n").start();
-  await sleep();
   if (answers.filename) {
-    const result = [];
+    const spinner = createSpinner("Creating...").start();
+    await sleep();
     chooselist.forEach((item) => {
       const selected = item.toLowerCase();
       const pluralize = `${selected}s`;
@@ -53,7 +57,11 @@ async function switchchoose(version, chooselist) {
 };
 `;
           createfile(filepath, controllertemplate);
-          result.push(`- ${pluralize}/${answers.filename}.${selected}.js`);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+          });
+
           break;
         case "service":
           const serivcetemplate = `module.exports = {
@@ -63,9 +71,12 @@ async function switchchoose(version, chooselist) {
 };
 `;
           createfile(filepath, serivcetemplate);
-          result.push(`- ${pluralize}/${answers.filename}.${selected}.js`);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+          });
           break;
-        case "service":
+        case "middleware":
           const middlewaretemplate = `module.exports = {
   ${answers.filename}: () => {
     return []
@@ -73,7 +84,10 @@ async function switchchoose(version, chooselist) {
 };
 `;
           createfile(filepath, middlewaretemplate);
-          result.push(`- ${pluralize}/${answers.filename}.${selected}.js`);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+          });
           break;
         case "model":
           const filecapitalize = capitalizeFirstLetter(answers.filename);
@@ -84,7 +98,10 @@ const ${answers.filename}Schema = mongoose.Schema({});
 module.exports = mongoose.model('${filecapitalize}', ${answers.filename}Schema);
 `;
           createfile(filepath, modeltemplate);
-          result.push(`- ${pluralize}/${answers.filename}.${selected}.js`);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+          });
           break;
         case "route":
           const routetemplate = `const express = require('express');
@@ -94,18 +111,16 @@ const router = express.Router();
 module.exports = router;
 `;
           createfile(filepath, routetemplate);
-          result.push(`- ${pluralize}/${answers.filename}.${selected}.js`);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+          });
           break;
         default:
           process.exit();
       }
     });
-    spinner.success({ text: "Done" });
-    console.log(result.join("\n"));
     process.exit();
-  } else {
-    spinner.error({ text: "Please enter file name..." });
-    switchchoose(version, chooselist);
   }
 }
 
@@ -115,14 +130,16 @@ async function actions(version) {
     type: "checkbox",
     message: "Select the item you want to create:",
     choices: ["Controller", "Service", "Model", "Route", "Middleware"],
+    validate: function (input) {
+      if (input.length === 0) {
+        return "Please seleted";
+      }
+      return true;
+    },
   });
-  const spinner = createSpinner("Checking...").start();
-  if (answers.actions.length === 0) {
-    spinner.error({ text: "Created failed" });
-    process.exit();
+  if (answers.actions.length > 0) {
+    switchchoose(version, answers.actions);
   }
-  spinner.success({ text: `Selected: ${answers.actions.length} item` });
-  switchchoose(version, answers.actions);
 }
 
 (async function start() {
