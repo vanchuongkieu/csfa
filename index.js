@@ -40,7 +40,7 @@ async function switchchoose(version, chooselist) {
     chooselist.forEach((item) => {
       const selected = item.toLowerCase();
       const pluralize = `${selected}s`;
-      const versionfolder = version !== "empty" ? `v${version}/` : "";
+      const versionfolder = version !== "empty" ? `${version}/` : "";
       const folderpath = `${process.cwd()}/src/api/${versionfolder}${pluralize}`;
       const filepath = `${folderpath}/${answers.filename}.${selected}.js`;
       createfolder(folderpath);
@@ -59,51 +59,69 @@ async function switchchoose(version, chooselist) {
           createfile(filepath, controllertemplate);
 
           spinner.success({
-            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
           });
 
           break;
         case "service":
-          const serivcetemplate = `module.exports = {
-  ${answers.filename}: () => {
-    return []
-  },
-};
-`;
+          const serivcetemplate = `module.exports = {}`;
           createfile(filepath, serivcetemplate);
 
           spinner.success({
-            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
+          });
+          break;
+        case "validation":
+          const validationtemplate = `module.exports = {}`;
+          createfile(filepath, validationtemplate);
+
+          spinner.success({
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
           });
           break;
         case "middleware":
-          const middlewaretemplate = `module.exports = {
-  ${answers.filename}: () => {
-    return []
-  },
-};
-`;
+          const middlewaretemplate = `module.exports = {}`;
           createfile(filepath, middlewaretemplate);
 
           spinner.success({
-            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
           });
           break;
         case "model":
           const filecapitalize = capitalizeFirstLetter(answers.filename);
+          const filelowercase = answers.filename.toLowerCase();
+          let fileadds = filelowercase.toLowerCase();
+          if (filelowercase.charAt(filelowercase.length - 1) !== "s") {
+            fileadds = `${filelowercase.toLowerCase()}s`;
+          }
           const modeltemplate = `const mongoose = require('mongoose');
 
-const ${answers.filename}Schema = mongoose.Schema({});
+const ${filecapitalize}Schema = new mongoose.Schema({
+  name: {
+    type: String,
+    default: ''
+  }
+}, { collection: '${fileadds}', timestamps: true });
 
-module.exports = mongoose.model('${filecapitalize}', ${answers.filename}Schema);
+module.exports = mongoose.model('${fileadds}', ${filecapitalize}Schema);
 `;
           createfile(filepath, modeltemplate);
 
           spinner.success({
-            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
           });
           break;
-        case "route":
+        case "router":
           const routetemplate = `const express = require('express');
 
 const router = express.Router();
@@ -113,7 +131,9 @@ module.exports = router;
           createfile(filepath, routetemplate);
 
           spinner.success({
-            text: `${capitalizeFirstLetter(pluralize)}: ${filepath}`,
+            text: `${capitalizeFirstLetter(pluralize)}: ${
+              answers.filename
+            }.${selected}.js`,
           });
           break;
         default:
@@ -129,7 +149,14 @@ async function actions(version) {
     name: "actions",
     type: "checkbox",
     message: "Select the item you want to create:",
-    choices: ["Controller", "Service", "Model", "Route", "Middleware"],
+    choices: [
+      "Controller",
+      "Service",
+      "Model",
+      "Router",
+      "Middleware",
+      "Validation",
+    ],
     validate: function (input) {
       if (input.length === 0) {
         return "Please seleted";
